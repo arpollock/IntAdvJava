@@ -20,3 +20,30 @@ public class Example {
     System.out.println("Finishing");
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ Lab 1 (hopefully very easy :)
+
+ thread 1 - print "Hello <count>" at 2 second intervals
+ thread 2 - print "Goodbye <count>" at 1 second intervals
+ optionally, shut down after count reaches ten.
+
+ This code will pause execution for 2000 milliseconds (i.e. 2 seconds)
+ Thread.sleep(2000);
+ However, it throws a checked exception... Ignore that exception :)
+ */
