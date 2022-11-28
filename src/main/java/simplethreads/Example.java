@@ -21,21 +21,6 @@ public class Example {
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*
  Lab 1 (hopefully very easy :)
 
@@ -46,4 +31,4 @@ public class Example {
  This code will pause execution for 2000 milliseconds (i.e. 2 seconds)
  Thread.sleep(2000);
  However, it throws a checked exception... Ignore that exception :)
- */
+*/
