@@ -88,11 +88,15 @@ class LabSolution {
     System.out.println("Static init in thread " +
         Thread.currentThread().getName());
   }
-  static /* volatile */ long count = 0;
+  static /*volatile*/ long count = 0;
+  private static Object rendezvous = new Object();
+
   static Runnable incrementer = () -> {
     System.out.println(Thread.currentThread().getName() + " incrementer starting");
-    for (int i = 0; i < 1_000_000_000; i++) {
-      count++;
+    for (int i = 0; i < 100_000_000; i++) {
+      synchronized (rendezvous) {
+        count++;
+      }
     }
     System.out.println(Thread.currentThread().getName() + " incrementer completed");
   };
@@ -100,19 +104,23 @@ class LabSolution {
     System.out.println("main() method in thread " +
         Thread.currentThread().getName());
     Thread t1 = new Thread(incrementer);
+    Thread t2 = new Thread(incrementer);
+
+    long start = System.nanoTime();
     t1.start();
 //    Thread.sleep(1000);
-    Thread t2 = new Thread(incrementer);
     t2.start();
 
 //    Thread.sleep(1000);
-//    t1.join();
-//    t2.join();
+    t1.join();
+    t2.join();
+    long time = System.nanoTime() - start;
 
-    while (t1.isAlive() || t2.isAlive())
-      ;
+//    while (t1.isAlive() || t2.isAlive())
+//      ;
 
     System.out.println("count is " + count);
+    System.out.printf("Time taken: %7.3f\n", (time / 1_000_000_000.0));
   }
 }
 
