@@ -165,3 +165,17 @@ class TestBadQueue {
     System.out.println("All done, exiting.");
   }
 }
+
+/* Day 2 Lab 2
+Add timing to the BadQueue transfer:
+- remove delays in the test code
+- add timing code and output
+- increase the volume of data copied to get a total time of 10~30 seconds
+Then:
+- change notifyAll to notify
+- redo timing any note any change
+Then:
+- change use of BadQueue to java.util.concurrent.ArrayBlockingQueue
+- redo timing any note any change
+ */
+
