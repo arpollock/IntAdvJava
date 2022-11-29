@@ -1,6 +1,8 @@
 package badqueue;
 
 import java.util.Arrays;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class BadQueue<E> {
   private final Object rendezvous = new Object();
@@ -114,7 +116,8 @@ Ensure:
 class TestBadQueue {
   public static void main(String[] args) throws InterruptedException {
     final int COUNT = 1000;
-    final BadQueue<int[]> queue = new BadQueue<>();
+//    final BadQueue<int[]> queue = new BadQueue<>();
+    final BlockingQueue<int[]> queue = new ArrayBlockingQueue<>(10);
     Thread producer = new Thread(() -> {
       System.out.println("Producer starting.");
       try {
@@ -179,3 +182,61 @@ Then:
 - redo timing any note any change
  */
 
+class TimeBadQueue {
+  public static void main(String[] args) throws InterruptedException {
+    final int COUNT = 50_000_000;
+    final BadQueue<int[]> queue = new BadQueue<>();
+    Thread producer = new Thread(() -> {
+      System.out.println("Producer starting.");
+      try {
+        for (int i = 0; i < COUNT; i++) {
+          int[] data = {i, 0}; // allocates a NEW array every time
+//          if (i < 100) {
+//            Thread.sleep(1);
+//          }
+          data[1] = i;
+          if (i == COUNT / 2) {
+            data[0] = -1; // test the test
+          }
+          queue.put(data);
+          data = null; // prevents reuse
+//          data[0]... NONONONONO! Don't use it
+        }
+      } catch (InterruptedException ie) {
+        System.out.println("Producer shutdown requested!");
+      }
+      System.out.println("Producer ending.");
+    });
+    Thread consumer = new Thread(() -> {
+      System.out.println("Consumer starting.");
+      try {
+        for (int i = 0; i < COUNT; i++) {
+          int[] data = queue.take();
+//          if (data[0] != data[1] || data[0] != i) {
+//            System.out.printf("Error at count %d, %s\n",
+//                i, Arrays.toString(data));
+//          }
+//          if (i > COUNT - 100) {
+//            Thread.sleep(1); // test queue full behavior
+//          }
+        }
+      } catch (InterruptedException ie) {
+        System.out.println("Consumer shutdown requested!");
+      }
+      System.out.println("Consumer ending.");
+    });
+    // grab time...
+    long start = System.nanoTime();
+    producer.start();
+    consumer.start();
+    System.out.println("Producer and consumer started by main");
+    producer.join();
+    consumer.join();
+    // grab time
+    long time = System.nanoTime() - start;
+    System.out.println("All done, exiting.");
+    double ftime = time / 1_000_000_000.0;
+    System.out.printf("Time %7.3f, throughput rate is %7.3f\n",
+        ftime, COUNT / ftime );
+  }
+}
