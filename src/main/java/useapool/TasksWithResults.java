@@ -32,7 +32,7 @@ class MyTaskWithResult implements Callable<String> {
 }
 
 public class TasksWithResults {
-  public static void main(String[] args) {
+  public static void main(String[] args) throws InterruptedException {
     ExecutorService es = Executors.newFixedThreadPool(2);
 
     List<Future<String>> lfs = new ArrayList<>();
@@ -41,6 +41,23 @@ public class TasksWithResults {
       lfs.add(fs);
     }
     System.out.println("All tasks submitted...");
+    Thread.sleep(500);
+    // true sends interrupt IF the task is already running
+    // task should respond to interrupt by either:
+    // - shutting down cleanly "now"
+    // - ignoring and completing normally BUT in the case of
+    //   a task in the executor service, normal completion still
+    //   cannot return a value through the Future
+//    lfs.get(1).cancel(true);
+//    System.out.println("Task 1 canceled...");
+
+    // blocks input queue
+    // removes not-started tasks
+    // interrupts started tasks
+    // DOES wait for tasks to complete
+//    System.out.println("Doing shutdownNow");
+//    es.shutdownNow();
+
     es.shutdown();
 //    es.submit(new MyTaskWithResult());
 
@@ -49,13 +66,21 @@ public class TasksWithResults {
       while (ifs.hasNext()) {
         Future<String> fs = ifs.next();
         if (fs.isDone()) {
-          try {
-            String result = fs.get();
-            System.out.println("Result is: " + result);
-          } catch (InterruptedException ie) {
-            System.out.println("main method got interrupt");
-          } catch (ExecutionException ee) {
-            System.out.println("Task threw an exception " + ee.getCause());
+          if (fs.isCancelled()) {
+            System.out.println("That one was canceled");
+          } else {
+            try {
+              String result = fs.get();
+              System.out.println("Result is: " + result);
+            } catch (InterruptedException ie) {
+              System.out.println("main method got interrupt");
+            } catch (ExecutionException ee) {
+              System.out.println("Task threw an exception " + ee.getCause());
+              // don't expect cancellation exception because we test
+              // for canceled above
+//          } catch (CancellationException ce) {
+//            System.out.println("oops, that task was already canceled");
+            }
           }
           ifs.remove();
         }
