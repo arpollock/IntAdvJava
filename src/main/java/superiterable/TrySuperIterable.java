@@ -9,10 +9,19 @@ public class TrySuperIterable {
         List.of("Fred", "Jim", "Sheila")
     );
 
+    names.forEach(System.out::println);
+/*
     for (String s : names) {
       System.out.println("> " + s);
     }
+*/
 
     Function<String, Integer> fsi = s -> s.length();
+
+    names
+        .filter(s -> s.charAt(0) != 'S')
+        .map(fsi)
+        .forEach(i -> System.out.println("length is " + i));
+
   }
 }
