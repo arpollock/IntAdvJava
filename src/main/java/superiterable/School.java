@@ -1,6 +1,7 @@
 package superiterable;
 
 import java.util.List;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 class Student {
@@ -88,8 +89,26 @@ public class School {
 
     System.out.println("----------");
 
-    Stream.iterate(0, x -> x + 1)
-        .forEach(System.out::println);
+//    Stream.iterate(0, x -> x + 1)
+//        .forEach(System.out::println);
+
+
+    IntStream.range(1, 11)
+        .reduce((a, b) -> a + b)
+        .ifPresentOrElse(v -> System.out.println("Sum is " + v),
+            () -> System.out.println("oops, no data"));
+
+    System.out.println("----------");
+    int result = IntStream.range(1, 11)
+        // Identity value (zero in this case)
+        // value of the data type
+        // can be applied to this operation any number of times
+        // without changing the result
+        // is the result of applying this operation zero times!?!?
+        .reduce(0, (a, b) -> a + b);
+    System.out.println("sum is " + result);
+
+
 
   }
 }
