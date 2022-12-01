@@ -25,6 +25,8 @@ public class Averager {
         () -> ThreadLocalRandom.current().nextDouble(-1, +1)
     )
         .limit(3_000_000_000L)
+//        .parallel()
+//        .sequential()
         .parallel()
         .mapToObj(v -> new Average(v, 1))
         .reduce(new Average(0, 0), Average::merge)
